@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { PlusCircle, Clock, User, Trophy, Flame, Building2, ThermometerSun, Snowflake } from 'lucide-react'
 import { CreditStatusBanner } from '@/components/ui/credit-status-banner'
+import { UpgradePaywall } from '@/components/ui/upgrade-paywall'
 import { getCreditStatus } from '@/lib/credits'
 
 export default async function DashboardOverview() {
@@ -68,8 +69,15 @@ export default async function DashboardOverview() {
                 </div>
             </div>
 
-            {/* Credit banner — only shown when WARNING or LOCKED */}
-            {!creditStatus.isNormal && (
+            {/* Credit section — paywall for LOCKED, banner for WARNING */}
+            {creditStatus.isLocked && (
+                <UpgradePaywall
+                    leadsGenerated={leadsCount ?? 0}
+                    campaignsCreated={activeCampaigns ?? 0}
+                    hotLeads={highPriorityCount ?? 0}
+                />
+            )}
+            {creditStatus.isWarning && (
                 <CreditStatusBanner status={creditStatus} />
             )}
 

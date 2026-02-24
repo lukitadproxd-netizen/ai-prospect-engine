@@ -3,7 +3,7 @@ import { SubmitButton } from './submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { getCreditStatus } from '@/lib/credits'
 import { CreditStatusBanner } from '@/components/ui/credit-status-banner'
-import { Lock } from 'lucide-react'
+import { UpgradePaywall } from '@/components/ui/upgrade-paywall'
 
 export default async function NewCampaignPage({
     searchParams,
@@ -24,6 +24,22 @@ export default async function NewCampaignPage({
     const creditsTotal = userProfile?.credits_total ?? 20
     const creditsUsed = userProfile?.credits_used ?? 0
     const creditStatus = getCreditStatus(creditsTotal, creditsUsed)
+
+    // Fetch achievement stats for the paywall (only when locked)
+    let leadsGenerated = 0
+    let campaignsCreated = 0
+    let hotLeads = 0
+
+    if (creditStatus.isLocked) {
+        const [leadsRes, campaignsRes, hotRes] = await Promise.all([
+            supabase.from('leads').select('*', { count: 'exact', head: true }),
+            supabase.from('campaigns').select('*', { count: 'exact', head: true }),
+            supabase.from('leads').select('*', { count: 'exact', head: true }).eq('is_high_priority', true),
+        ])
+        leadsGenerated = leadsRes.count ?? 0
+        campaignsCreated = campaignsRes.count ?? 0
+        hotLeads = hotRes.count ?? 0
+    }
 
     return (
         <div className="max-w-2xl mx-auto space-y-8">
@@ -57,27 +73,11 @@ export default async function NewCampaignPage({
 
             {/* LOCKED: show blocked state instead of the form */}
             {creditStatus.isLocked ? (
-                <div className="card p-12 flex flex-col items-center justify-center text-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
-                        <Lock className="w-7 h-7 text-red-400" />
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-lg font-bold text-slate-900">
-                            No AI generations left
-                        </h2>
-                        <p className="text-sm text-slate-500 max-w-sm">
-                            You&apos;ve used all your credits for this month. Upgrade your plan to create more campaigns and keep finding leads.
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-3 pt-2">
-                        <a href="/campaigns" className="btn-secondary text-sm">
-                            View existing campaigns
-                        </a>
-                        <a href="/settings#upgrade" className="btn-primary text-sm">
-                            Upgrade plan →
-                        </a>
-                    </div>
-                </div>
+                <UpgradePaywall
+                    leadsGenerated={leadsGenerated}
+                    campaignsCreated={campaignsCreated}
+                    hotLeads={hotLeads}
+                />
             ) : (
                 <div className="card p-8">
                     <form action={createCampaign} className="space-y-6">
