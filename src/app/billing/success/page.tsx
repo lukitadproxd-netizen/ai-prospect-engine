@@ -61,15 +61,46 @@ export default async function BillingSuccessPage({
             if (packMetadata.userId === user.id) {
                 const pack = CREDIT_PACKS.find(p => p.id === packMetadata.packId)
                 if (pack) {
-                    // Give credits
+
+                    // ── Idempotency Check ──
+                    const { data: existingPayment } = await supabase
+                        .from('payments')
+                        .select('id')
+                        .eq('paypal_order_id', token)
+                        .maybeSingle()
+
                     const { data: profile } = await supabase.from('users').select('credits_total').eq('id', user.id).single()
-                    const newTotal = (profile?.credits_total || 20) + pack.amount
+                    const currentTotal = profile?.credits_total || 20
 
-                    await supabase.from('users').update({ credits_total: newTotal }).eq('id', user.id)
+                    if (existingPayment) {
+                        // Order already processed by us (e.g. user refreshed the page)
+                        success = true
+                        packLabel = pack.label
+                        addedCredits = pack.amount
+                        newTotalDisplay = currentTotal // no new credits added this time
+                    } else {
+                        // Fresh order: Insert payment record FIRST (Atomicity focus)
+                        const { error: insertError } = await supabase.from('payments').insert({
+                            paypal_order_id: token,
+                            user_id: user.id,
+                            pack_id: pack.id,
+                            credits_added: pack.amount
+                        })
 
-                    success = true
-                    packLabel = pack.label
-                    addedCredits = pack.amount
+                        if (insertError) {
+                            throw new Error("Failed to secure payment record. Aborting credit addition to prevent anomalies.")
+                        }
+
+                        // Payment secured -> Give credits
+                        const newTotal = currentTotal + pack.amount
+                        await supabase.from('users').update({ credits_total: newTotal }).eq('id', user.id)
+
+                        success = true
+                        packLabel = pack.label
+                        addedCredits = pack.amount
+                        newTotalDisplay = newTotal
+                    }
+
                 } else {
                     errorMessage = "Invalid credit pack detected in order."
                 }
@@ -78,9 +109,18 @@ export default async function BillingSuccessPage({
             }
         }
         else if (data.details?.[0]?.issue === 'ORDER_ALREADY_CAPTURED' || data.message?.includes('ORDER_ALREADY_CAPTURED')) {
-            // Handle page refresh gracefully
-            success = true
-            errorMessage = "Order was already processed successfully."
+            // Re-fetch to show correct total if already captured at PayPal level too
+            const { data: existingPayment } = await supabase.from('payments').select('credits_added, pack_id').eq('paypal_order_id', token).maybeSingle()
+            if (existingPayment) {
+                const { data: profile } = await supabase.from('users').select('credits_total').eq('id', user.id).single()
+                const pack = CREDIT_PACKS.find(p => p.id === existingPayment.pack_id)
+                success = true
+                packLabel = pack?.label || 'Credit Pack'
+                addedCredits = existingPayment.credits_added
+                newTotalDisplay = profile?.credits_total || 0
+            } else {
+                errorMessage = "Order was captured by PayPal but processing failed on our end. Please contact support."
+            }
         }
         else if (data.name === 'INSTRUMENT_DECLINED') {
             errorMessage = "Payment instrument was declined."
@@ -135,10 +175,10 @@ export default async function BillingSuccessPage({
                         )}
 
                         <div className="pt-4">
-                            <Link href="/dashboard" className="btn-primary w-full justify-center group h-12 text-base shadow-md shadow-blue-500/20">
+                            <a href="/dashboard" className="btn-primary w-full justify-center group h-12 text-base shadow-md shadow-blue-500/20">
                                 Back to Dashboard
                                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                            </a>
                         </div>
                     </>
                 ) : (
