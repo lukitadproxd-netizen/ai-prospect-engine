@@ -39,7 +39,7 @@ function PackCard({ pack, index }: { pack: CreditPack; index: number }) {
     const isBestValue = pack.badge === 'Best Value'
 
     const purchaseAction = useCallback(async () => {
-        const res = await fetch('/api/credits', {
+        const res = await fetch('/api/paypal/create-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ packId: pack.id }),
@@ -47,16 +47,21 @@ function PackCard({ pack, index }: { pack: CreditPack; index: number }) {
 
         const data = await res.json()
 
-        if (!res.ok) throw new Error(data.error || 'Purchase failed')
+        if (!res.ok) throw new Error(data.error || 'Checkout failed to start')
 
-        return data as { creditsAdded: number; newTotal: number }
+        // Redirect to PayPal
+        window.location.href = data.checkoutUrl
+
+        // Hang the promise so the button stays in spinning "Processing..." state
+        // until the browser fully unloads to navigate to PayPal.
+        return new Promise(() => { })
     }, [pack.id])
 
-    const { status, execute } = useAsyncAction<{ creditsAdded: number; newTotal: number }>(
+    const { status, execute } = useAsyncAction<any>(
         purchaseAction,
         {
-            successResetMs: 0, // keep success state until page refresh
-            onSuccess: () => router.refresh(),
+            successResetMs: 0,
+            onSuccess: () => { }, // Handled by navigation to PayPal
         }
     )
 
