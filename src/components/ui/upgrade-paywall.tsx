@@ -54,19 +54,19 @@ export function UpgradePaywall({
             <div className="p-8 sm:p-10 space-y-8">
                 {/* Header — continuity, not error */}
                 <div className="text-center space-y-3 max-w-lg mx-auto">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-blue-700 text-xs font-semibold uppercase tracking-wider">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        You&apos;re on a roll
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100 text-emerald-700 text-xs font-semibold uppercase tracking-wider">
+                        <Zap className="w-3.5 h-3.5" />
+                        Credits Exhausted
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Your pipeline is growing.
+                        Your AI sales department is
                         <br />
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                            Keep the momentum going.
+                            ready to keep working.
                         </span>
                     </h2>
                     <p className="text-sm text-slate-500 leading-relaxed">
-                        You&apos;ve built real traction with AI Prospect Engine. Unlock more credits to scale what&apos;s already working — your leads, scores, and messages are all saved.
+                        Upgrade to continue generating qualified opportunities. Let your AI handle the heavy lifting while you focus on closing deals.
                     </p>
                 </div>
 

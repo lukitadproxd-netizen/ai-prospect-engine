@@ -35,26 +35,26 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4" />
-              <span>AI-Powered B2B Prospecting</span>
+              <span>Let your AI sales department do the heavy lifting</span>
             </div>
 
             <h1 className="mx-auto max-w-4xl font-extrabold tracking-tight text-slate-900 text-5xl sm:text-7xl mb-8 leading-[1.1]">
-              Find, Score & Personalize
+              Your AI Sales Department —
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                B2B Leads in Minutes.
+                finding clients while you close.
               </span>
             </h1>
 
             <p className="mx-auto max-w-2xl text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed">
-              Stop wasting hours on manual prospecting. Our AI Engine discovers businesses, scores them with Gemini AI, and generates hyper-personalized cold emails — all in one click.
+              AI Prospect Engine finds businesses, evaluates opportunities and prepares personalized outreach — ready for you to close.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/login" className="btn-primary py-3.5 px-8 text-base shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all rounded-full flex items-center gap-2">
-                Start Your Lead Engine <ArrowRight className="w-4 h-4" />
+                Start Free — 10 AI Prospects <ArrowRight className="w-4 h-4" />
               </Link>
               <span className="text-sm text-slate-500">
-                Free trial — 20 leads included, no credit card
+                No credit card required
               </span>
             </div>
           </div>
@@ -113,15 +113,15 @@ export default function Home() {
           </div>
         </div>
 
-        {/* How It Works */}
+        {/* Wow Section */}
         <div className="py-24 sm:py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                How It Works
+                Replace hours of prospecting with AI-powered execution.
               </h2>
               <p className="mt-4 text-lg text-slate-600">
-                From zero to personalized outreach in 3 steps.
+                Let your AI sales department do the heavy lifting.
               </p>
             </div>
             <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
@@ -130,24 +130,24 @@ export default function Home() {
                 <div className="mx-auto w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Define Your Target</h3>
-                <p className="text-slate-600 text-sm">Enter your niche, country, and value proposition. Our engine searches Google Maps to find matching businesses.</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Finds real businesses</h3>
+                <p className="text-slate-600 text-sm">Enter your niche and location. Your AI parses live Google Maps data to surface active, highly-relevant local businesses.</p>
               </div>
               <div className="relative card p-8 bg-slate-50/50 border-none shadow-none text-center">
                 <div className="absolute -top-3 -left-3 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
                 <div className="mx-auto w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6">
                   <BarChart className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">AI Scores Each Lead</h3>
-                <p className="text-slate-600 text-sm">Gemini AI analyzes each lead across 6 criteria — niche fit, company size, decision maker access, pain point alignment, and more.</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Scores like an expert</h3>
+                <p className="text-slate-600 text-sm">Gemini AI analyzes every target, scoring them across deep qualification metrics so you only focus on the hottest opportunities.</p>
               </div>
               <div className="relative card p-8 bg-slate-50/50 border-none shadow-none text-center">
                 <div className="absolute -top-3 -left-3 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
                 <div className="mx-auto w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Personalized Outreach</h3>
-                <p className="text-slate-600 text-sm">Generate cold emails and LinkedIn messages tailored to each lead — not templates, real personalization.</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Prepares outreach</h3>
+                <p className="text-slate-600 text-sm">Instantly drafts highly-personalized emails tailored to each company&apos;s exact profile. Ready to hit send and close the deal.</p>
               </div>
             </div>
           </div>
