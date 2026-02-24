@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { PlusCircle, Clock, User, Trophy, Flame, Building2, ThermometerSun, Snowflake } from 'lucide-react'
+import { CreditStatusBanner } from '@/components/ui/credit-status-banner'
+import { getCreditStatus } from '@/lib/credits'
 
 export default async function DashboardOverview() {
     const supabase = await createClient()
@@ -35,6 +37,8 @@ export default async function DashboardOverview() {
     const creditsUsed = userProfile?.credits_used ?? 0
     const creditsAvailable = creditsTotal - creditsUsed
 
+    const creditStatus = getCreditStatus(creditsTotal, creditsUsed)
+
     return (
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -47,14 +51,27 @@ export default async function DashboardOverview() {
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className="flex bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold shadow-sm border border-blue-100">
-                        {creditsAvailable} / {creditsTotal} credits available
-                    </div>
-                    <a href="/campaigns/new" className="btn-primary shadow-sm shadow-blue-600/20">
-                        <PlusCircle className="w-4 h-4 mr-2" /> New Campaign
-                    </a>
+                    <CreditStatusBanner status={creditStatus} compact />
+                    {creditStatus.isLocked ? (
+                        <span
+                            className="btn-primary opacity-50 cursor-not-allowed shadow-none"
+                            title="Upgrade your plan to create more campaigns"
+                            aria-disabled="true"
+                        >
+                            <PlusCircle className="w-4 h-4 mr-2" /> New Campaign
+                        </span>
+                    ) : (
+                        <a href="/campaigns/new" className="btn-primary shadow-sm shadow-blue-600/20">
+                            <PlusCircle className="w-4 h-4 mr-2" /> New Campaign
+                        </a>
+                    )}
                 </div>
             </div>
+
+            {/* Credit banner — only shown when WARNING or LOCKED */}
+            {!creditStatus.isNormal && (
+                <CreditStatusBanner status={creditStatus} />
+            )}
 
             <div className="grid gap-6 md:grid-cols-3">
                 <div className="card p-6 flex flex-col items-start gap-4 hover:shadow-md transition-shadow">
