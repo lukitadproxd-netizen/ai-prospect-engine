@@ -1,8 +1,14 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { Download, Filter, Search, Flame, ThermometerSun, Snowflake, X } from 'lucide-react'
-import { MessageModal } from '@/components/message-modal'
+import { useState, useMemo, useCallback } from 'react'
+import dynamic from 'next/dynamic'
+import { Download, Search, Flame, ThermometerSun, Snowflake, X } from 'lucide-react'
+
+// Lazy: only load the modal bundle when user clicks "Personalize"
+const MessageModal = dynamic(
+    () => import('@/components/message-modal').then(m => ({ default: m.MessageModal })),
+    { ssr: false }
+)
 
 interface Lead {
     id: string
@@ -46,7 +52,7 @@ export function LeadsTable({ leads }: LeadsTableProps) {
         })
     }, [leads, query, filterStatus])
 
-    function exportCSV() {
+    const exportCSV = useCallback(() => {
         const headers = ['Business', 'Role', 'Campaign', 'Country', 'Score', 'Status', 'Website']
         const rows = filtered.map(l => [
             `"${l.business_name}"`,
@@ -66,7 +72,7 @@ export function LeadsTable({ leads }: LeadsTableProps) {
         a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`
         a.click()
         URL.revokeObjectURL(url)
-    }
+    }, [filtered])
 
     const filterOptions: { label: string; value: FilterStatus }[] = [
         { label: 'All', value: 'all' },

@@ -1,8 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { MessageSquare, Sparkles } from 'lucide-react'
-import { MessageModal } from '@/components/message-modal'
+
+// Lazy: modal code only loaded on first click, not on page load
+const MessageModal = dynamic(
+    () => import('@/components/message-modal').then(m => ({ default: m.MessageModal })),
+    { ssr: false }
+)
 
 interface GenerateMessageButtonProps {
     leadId: string
@@ -13,18 +19,18 @@ export function GenerateMessageButton({ leadId, leadName }: GenerateMessageButto
     const [open, setOpen] = useState(false)
     const [hasGenerated, setHasGenerated] = useState(false)
 
-    function handleOpen() {
+    const handleOpen = useCallback(() => {
         setOpen(true)
         setHasGenerated(true)
-    }
+    }, [])
 
     return (
         <>
             <button
                 onClick={handleOpen}
                 className={`btn-secondary flex items-center gap-2 whitespace-nowrap group transition-all duration-200 ${hasGenerated && !open
-                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                        : ''
+                    ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                    : ''
                     }`}
                 aria-label={`Generate personalized message for ${leadName}`}
             >

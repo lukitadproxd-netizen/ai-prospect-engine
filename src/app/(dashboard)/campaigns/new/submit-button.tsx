@@ -1,8 +1,15 @@
 'use client'
 
 import { useFormStatus } from 'react-dom'
+import dynamic from 'next/dynamic'
 import { Rocket } from 'lucide-react'
-import { LoadingSteps, CAMPAIGN_STEPS } from '@/components/ui/loading-steps'
+import { CAMPAIGN_STEPS } from '@/components/ui/loading-steps'
+
+// Lazy: animated steps panel only loads after user submits the form
+const LoadingSteps = dynamic(
+    () => import('@/components/ui/loading-steps').then(m => ({ default: m.LoadingSteps })),
+    { ssr: false, loading: () => null }
+)
 
 export function SubmitButton() {
     const { pending } = useFormStatus()

@@ -2,10 +2,17 @@
 
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { Brain, CheckCircle2 } from 'lucide-react'
 import { useAsyncAction } from '@/hooks/use-async-action'
 import { AsyncButton } from '@/components/ui/async-button'
-import { LoadingSteps, SCORING_STEPS } from '@/components/ui/loading-steps'
+import { SCORING_STEPS } from '@/components/ui/loading-steps'
+
+// Lazy: step-by-step panel only loads when scoring starts
+const LoadingSteps = dynamic(
+    () => import('@/components/ui/loading-steps').then(m => ({ default: m.LoadingSteps })),
+    { ssr: false, loading: () => null }
+)
 
 interface ScoreButtonProps {
     campaignId: string
