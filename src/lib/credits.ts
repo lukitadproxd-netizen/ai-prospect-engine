@@ -3,7 +3,51 @@
  * No API calls — receives the already-fetched credit values.
  */
 
+// ─── Credit Packs catalog ────────────────────────────────────────────────────
+// To integrate Stripe: populate stripe_price_id with the Price ID from your
+// Stripe Dashboard (e.g., "price_1OxNzFLkj...") and route to Stripe Checkout.
+
+export interface CreditPack {
+    id: string
+    amount: number
+    price: number        // USD
+    label: string
+    badge?: string       // e.g. "Most Popular"
+    pricePerCredit: number
+    stripePriceId: string | null // null = Stripe not yet configured
+}
+
+export const CREDIT_PACKS: CreditPack[] = [
+    {
+        id: 'pack_50',
+        amount: 50,
+        price: 9,
+        label: 'Starter Pack',
+        pricePerCredit: 0.18,
+        stripePriceId: null,
+    },
+    {
+        id: 'pack_150',
+        amount: 150,
+        price: 19,
+        label: 'Growth Pack',
+        badge: 'Most Popular',
+        pricePerCredit: 0.13,
+        stripePriceId: null,
+    },
+    {
+        id: 'pack_500',
+        amount: 500,
+        price: 49,
+        label: 'Scale Pack',
+        badge: 'Best Value',
+        pricePerCredit: 0.10,
+        stripePriceId: null,
+    },
+]
+
 export type CreditTier = 'NORMAL' | 'WARNING' | 'LOCKED'
+
 
 export interface CreditStatus {
     tier: CreditTier

@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { User, CreditCard, Key, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { User, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { CreditPacks } from '@/components/ui/credit-packs'
+import { getCreditStatus } from '@/lib/credits'
 
 export default async function SettingsPage() {
     const supabase = await createClient()
@@ -14,7 +16,8 @@ export default async function SettingsPage() {
     const creditsTotal = profile?.credits_total ?? 20
     const creditsUsed = profile?.credits_used ?? 0
     const creditsAvailable = creditsTotal - creditsUsed
-    const usagePercentage = Math.min(100, Math.round((creditsUsed / creditsTotal) * 100))
+    const creditStatus = getCreditStatus(creditsTotal, creditsUsed)
+    const usagePercentage = creditStatus.usagePercent
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -89,11 +92,18 @@ export default async function SettingsPage() {
                     </p>
                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div
-                            className="h-full bg-blue-600 transition-all duration-500"
+                            className={`h-full transition-all duration-500 ${creditStatus.isLocked ? 'bg-red-500' :
+                                    creditStatus.isWarning ? 'bg-amber-400' : 'bg-blue-600'
+                                }`}
                             style={{ width: `${usagePercentage}%` }}
-                        ></div>
+                        />
                     </div>
                 </div>
+            </div>
+
+            {/* Credit Packs */}
+            <div className="space-y-6 pt-6 border-t border-slate-100">
+                <CreditPacks currentTotal={creditsTotal} currentUsed={creditsUsed} />
             </div>
 
             {/* Danger Zone */}
