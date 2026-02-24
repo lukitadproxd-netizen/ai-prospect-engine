@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Brain, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Brain, CheckCircle2 } from 'lucide-react'
+import { useAsyncAction } from '@/hooks/use-async-action'
+import { AsyncButton } from '@/components/ui/async-button'
 import { LoadingSteps, SCORING_STEPS } from '@/components/ui/loading-steps'
 
 interface ScoreButtonProps {
@@ -11,9 +13,32 @@ interface ScoreButtonProps {
 }
 
 export function ScoreButton({ campaignId, unscoredCount }: ScoreButtonProps) {
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-    const [result, setResult] = useState<{ scored: number; errors: number; lastError?: string } | null>(null)
     const router = useRouter()
+
+    const scoreAction = useCallback(async () => {
+        const response = await fetch('/api/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ campaignId }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Scoring failed')
+        }
+
+        return data as { scored: number; errors: number }
+    }, [campaignId])
+
+    const { status, data, error, execute, isLoading, isSuccess } = useAsyncAction<{ scored: number; errors: number }>(
+        scoreAction,
+        {
+            successResetMs: 4000,
+            errorResetMs: 5000,
+            onSuccess: () => router.refresh(),
+        }
+    )
 
     if (unscoredCount === 0 && status === 'idle') {
         return (
@@ -24,69 +49,35 @@ export function ScoreButton({ campaignId, unscoredCount }: ScoreButtonProps) {
         )
     }
 
-    async function handleScore() {
-        setStatus('loading')
-        try {
-            const response = await fetch('/api/score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ campaignId }),
-            })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                setStatus('error')
-                setResult({ scored: 0, errors: 1, lastError: data.error })
-                return
-            }
-
-            setResult(data)
-            setStatus('success')
-            router.refresh()
-        } catch {
-            setStatus('error')
-            setResult({ scored: 0, errors: 1, lastError: 'Network error' })
-        }
-    }
-
     return (
         <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-3">
-                {status === 'success' && result && (
+                {isSuccess && data && (
                     <span className="text-sm text-emerald-600 font-medium animate-fade-in-up">
-                        {result.scored} leads scored
+                        {data.scored} leads scored
                     </span>
                 )}
+
                 {status === 'error' && (
-                    <span className="flex items-center gap-1 text-sm text-red-600 font-medium max-w-xs truncate animate-fade-in-up" title={result?.lastError}>
-                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                        {result?.lastError || 'Scoring failed'}
+                    <span className="text-sm text-red-600 font-medium animate-fade-in-up max-w-xs truncate" title={error ?? undefined}>
+                        {error}
                     </span>
                 )}
-                <button
-                    onClick={handleScore}
-                    disabled={status === 'loading'}
-                    className={`btn-primary flex items-center gap-2 ${status === 'loading'
-                            ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/25 hover:shadow-indigo-500/40'
-                            : ''
-                        }`}
+
+                <AsyncButton
+                    status={status}
+                    onClick={() => execute()}
+                    loadingText="Scoring with AI..."
+                    successText={`${data?.scored ?? 0} scored!`}
+                    errorText="Retry Score"
+                    ariaLabel={`Score ${unscoredCount} leads using AI`}
                 >
-                    {status === 'loading' ? (
-                        <>
-                            <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                            Scoring with AI...
-                        </>
-                    ) : (
-                        <>
-                            <Brain className="w-4 h-4" />
-                            {status === 'success' ? 'Re-score Leads' : `Score ${unscoredCount} Leads with AI`}
-                        </>
-                    )}
-                </button>
+                    <Brain className="w-4 h-4" />
+                    {isSuccess ? 'Re-score Leads' : `Score ${unscoredCount} Leads with AI`}
+                </AsyncButton>
             </div>
 
-            {status === 'loading' && (
+            {isLoading && (
                 <div className="w-80 card p-5 animate-fade-in-up">
                     <LoadingSteps
                         steps={SCORING_STEPS}
