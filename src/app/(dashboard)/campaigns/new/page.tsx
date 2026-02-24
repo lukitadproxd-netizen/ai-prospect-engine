@@ -95,10 +95,12 @@ export default async function NewCampaignPage({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                        <a href="/campaigns" className="btn-secondary">
-                            Cancel
-                        </a>
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                        <div className="flex items-center justify-end gap-3">
+                            <a href="/campaigns" className="btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
                         <SubmitButton />
                     </div>
                 </form>

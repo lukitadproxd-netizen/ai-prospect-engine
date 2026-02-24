@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { X, Mail, Linkedin, Loader2, Copy, CheckCheck, RefreshCw, AlertCircle } from 'lucide-react'
+import { X, Mail, Linkedin, Copy, CheckCheck, RefreshCw, AlertCircle } from 'lucide-react'
+import { LoadingSteps, MESSAGE_STEPS } from '@/components/ui/loading-steps'
 
 interface MessageModalProps {
     leadId: string
@@ -99,8 +100,8 @@ export function MessageModal({ leadId, leadName, onClose }: MessageModalProps) {
                         onClick={() => generate('email')}
                         disabled={loading}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${msgType === 'email'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                     >
                         <Mail className="w-4 h-4" />
@@ -110,8 +111,8 @@ export function MessageModal({ leadId, leadName, onClose }: MessageModalProps) {
                         onClick={() => generate('linkedin')}
                         disabled={loading}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${msgType === 'linkedin'
-                                ? 'bg-blue-700 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-blue-700 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                     >
                         <Linkedin className="w-4 h-4" />
@@ -122,10 +123,13 @@ export function MessageModal({ leadId, leadName, onClose }: MessageModalProps) {
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
                     {loading && (
-                        <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
-                            <p className="text-sm font-medium">Generating personalized message...</p>
-                            <p className="text-xs text-slate-400 mt-1">Analyzing lead data with Gemini AI</p>
+                        <div className="flex flex-col items-center justify-center py-10">
+                            <LoadingSteps
+                                steps={MESSAGE_STEPS}
+                                isActive={true}
+                                title={`Crafting message for ${leadName}`}
+                                subtitle="Powered by Gemini AI"
+                            />
                         </div>
                     )}
 
