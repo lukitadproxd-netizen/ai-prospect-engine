@@ -28,6 +28,7 @@ export default async function BillingSuccessPage({
     let errorMessage = ''
     let packLabel = ''
     let addedCredits = 0
+    let newTotalDisplay = 0
 
     try {
         const accessToken = await getPayPalAccessToken()
@@ -107,26 +108,35 @@ export default async function BillingSuccessPage({
                             <p className="text-slate-500">
                                 {addedCredits > 0
                                     ? `You've successfully added ${addedCredits} AI credits to your account.`
-                                    : errorMessage
+                                    : 'Your payment was processed successfully.'
                                 }
                             </p>
                         </div>
 
                         {addedCredits > 0 && (
-                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 text-left">
-                                <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-1">Items Purchased</span>
-                                <div className="flex items-center justify-between font-semibold text-slate-800">
-                                    <span>{packLabel}</span>
-                                    <span className="flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                                        <Zap className="w-4 h-4" fill="currentColor" /> {addedCredits}
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 text-left space-y-4">
+                                <div>
+                                    <span className="text-xs text-slate-400 font-medium uppercase tracking-wider block mb-1">Purchased Pack</span>
+                                    <div className="flex items-center justify-between font-semibold text-slate-800">
+                                        <span>{packLabel}</span>
+                                        <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                                            +{addedCredits}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="h-px w-full bg-slate-200" />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-slate-500">New Total Balance</span>
+                                    <span className="flex items-center gap-1.5 font-bold text-blue-600">
+                                        <Zap className="w-4 h-4" fill="currentColor" /> {newTotalDisplay}
                                     </span>
                                 </div>
                             </div>
                         )}
 
                         <div className="pt-4">
-                            <Link href="/dashboard" className="btn-primary w-full justify-center group h-12 text-base">
-                                Continue to Dashboard
+                            <Link href="/dashboard" className="btn-primary w-full justify-center group h-12 text-base shadow-md shadow-blue-500/20">
+                                Back to Dashboard
                                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>
